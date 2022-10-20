@@ -1,5 +1,6 @@
 body {
     background-color: rgb(17, 21, 35);
+    min-width:960px;
   }
   h1 {
     color: rgb(109, 164, 236);
@@ -36,12 +37,41 @@ select {
   margin: 4px 2px;
 }
 
-table, th, td {
+/* table, th, td {
   border: 1px solid rgb(33, 37, 73);
   border-collapse: collapse;
   color: rgb(99, 152, 120);
   background-color: #111; 
+  transition-property: background-color;
+  transition-timing-function: ease-in-out;
+  transition-duration: 3s;
 }
+
+.transformed-state {
+  background-color: blue;
+
+  transition-property: background-color;
+  transition-timing-function: ease-in-out;
+  transition-duration: 3s;
+} */
+
+table, th, td {
+  border: 1px solid rgb(33, 37, 73);
+  border-collapse: collapse;
+  color: rgb(99, 152, 120);
+  background-color: rgb(17, 21, 35);
+  transition-property: background-color;
+  transition-timing-function: ease-in-out;
+  transition-duration: 1s;
+}
+
+.transformed-state {
+  background-color: #111;
+  transition-property: background-color;
+  transition-timing-function: ease-in-out;
+  transition-duration: 1s;
+}
+
 
 table {
   width: 85%;
@@ -60,6 +90,34 @@ th {
 }
 
 
+rect {
+  fill:blue;
+  stroke-width:0;
+  fill-opacity:0.0;
+  transition-timing-function: ease-in-out;
+  transition-duration: 0.5s;
+}
+
+.transformed-state-rect {
+  fill-opacity:0.5;
+  transition-timing-function: ease-in-out;
+  transition-duration: 0.5s;
+}
+
+.natural-state-rect {
+  fill-opacity:0;
+  transition-timing-function: ease-in-out;
+  transition-duration: 0.5s;
+}
+
+.device {
+  min-width: 600;
+}
+
+.deviceDisplay {
+  font: 40px sans-serif;
+  fill: red
+}
 
 .sidebar {
   height: 100%; 
@@ -93,3 +151,21 @@ th {
   color: #5768ff;
 }
 
+
+.img-overlay-wrap {
+  position: relative;
+  display: inline-block; /* <= shrinks container to image size */
+  transition: transform 150ms ease-in-out;
+}
+
+.img-overlay-wrap img { /* <= optional, for responsiveness */
+   display: block;
+   max-width: 100%;
+   height: auto;
+}
+
+.img-overlay-wrap svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

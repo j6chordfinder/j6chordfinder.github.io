@@ -24,7 +24,36 @@
         <div>
             <h1>J-6 Chord Finder</h1>
         </div>
-        <img src="image.png" style="width:600px;height:350px;">
+
+        <div class="img-block">
+            <div class="img-overlay-wrap">
+
+                <img id="device" src="image.png" style="width:600px;height:350px;">
+                <svg id="graphics" viewBox="0 0 600 350">
+                    <!--<circle cx="75" cy="75" r="50" fill="rebeccapurple"/>-->
+                    <rect x="104" y="251" width="34" height="57" id="C"/>
+                    <rect x="155" y="251" width="34" height="57" id="D"/>
+                    <rect x="206" y="251" width="34" height="57" id="E"/>
+                    <rect x="257" y="251" width="34" height="57" id="F"/>
+                    <rect x="308" y="251" width="34" height="57" id="G"/>
+                    <rect x="359" y="251" width="34" height="57" id="A"/>
+                    <rect x="410" y="251" width="34" height="57" id="B"/>
+                    <rect x="461" y="251" width="34" height="57" id="C2"/>
+
+
+                    <rect x="133" y="191" width="27" height="41" id="C´"/>
+                    <rect x="184" y="191" width="27" height="41" id="D´"/>
+                    <rect x="286" y="191" width="27" height="41" id="F´"/>
+                    <rect x="337" y="191" width="27" height="41" id="G´"/>
+                    <rect x="388" y="191" width="27" height="41" id="A´"/>
+
+                    <text x="50" y="116"  id="PatternNo" class="deviceDisplay">0</text>
+                </svg>
+            
+            </div>
+
+        </div>
+        
         <br>
         <br>
 
@@ -44,13 +73,13 @@
         <div>
             <p>
                 <br>
-                <div id="patternList">
+                <div class ="patterns" id="patternList">
                     <p>
-                        No chords selected. <br>
+                        No chords selected. <br><br>
                         To use this web-app, use the Add Chord button above to input chords, then use the Find Patterns button.<br>
                         If you do not get any results, try removing the chords until you are able to match to an available pattern.<br>
                         <br>
-                        This page is under construction. Check back for an updating image showing the chord placement on the J-6 keypad.<br>
+                        <br>
                     </p>
                 </div>
             </p>
@@ -71,11 +100,12 @@
         var chordsMeta;
         var settings;
         var matchingPatterns = [];
-        var patternID 
-        var patternData 
-        var buttons 
-        var patternChords 
-        var patternNotes 
+        var patternID;
+        var patternData; 
+        var buttons;
+        var patternChords;
+        var patternNotes;
+        var displayedKeys = [];
 
         fetch("chords.json")
             .then(response => response.json())
@@ -116,19 +146,19 @@
 
 
         function addChordClick() {
-            console.log('add clicked');
             var curSelectLen = currentSelects.length;
-            tonicSelector      = addSelector(tonicArray,tonicArray, 'tonic');
-            accidentalSelector = addSelector(accidentalArray,accidentalValues, 'accidental');
-            scaleSelector      = addSelector(scaleArray,scaleArray, 'scale');
-            typeSelector       = addSelector(typeArray,typeValue, 'type');
-            chordSelector      = addSelector(Object.keys(chordsMeta),Object.keys(chordsMeta), 'chord');
-            lineBreak          = document.createElement("br");
-            chordDiv.appendChild(lineBreak);
-            var chordRow = [tonicSelector, accidentalSelector, scaleSelector, typeSelector, chordSelector, lineBreak];
-            currentSelects.push(chordRow);
-            //console.log(tonicSelector.id)
-            updateChordSelects(tonicSelector.id)
+            if (curSelectLen < 8) {
+                tonicSelector      = addSelector(tonicArray,tonicArray, 'tonic');
+                accidentalSelector = addSelector(accidentalArray,accidentalValues, 'accidental');
+                scaleSelector      = addSelector(scaleArray,scaleArray, 'scale');
+                typeSelector       = addSelector(typeArray,typeValue, 'type');
+                chordSelector      = addSelector(Object.keys(chordsMeta),Object.keys(chordsMeta), 'chord');
+                lineBreak          = document.createElement("br");
+                chordDiv.appendChild(lineBreak);
+                var chordRow = [tonicSelector, accidentalSelector, scaleSelector, typeSelector, chordSelector, lineBreak];
+                currentSelects.push(chordRow);
+                updateChordSelects(tonicSelector.id);
+            }
         };
 
 
@@ -138,8 +168,6 @@
         };
         
         function updateChordSelectChildren(selectActive, children) {
-            //console.log(selectActive)
-            //console.log(children)
             deleteChildren(selectActive);
             for (var i=0; i<children.length; i++) {
                 var option = document.createElement("option");
@@ -152,9 +180,7 @@
 
         function updateChordSelects(objectId) {
             for (var i=0; i<currentSelects.length; i++) {
-                var objectIds = currentSelects[i].map(function(a){return a.id})
-                //console.log(objectId)
-                //console.log(objectIds)
+                var objectIds = currentSelects[i].map(function(a){return a.id});
                 if (objectIds.includes(objectId)) {
                     var tonic = currentSelects[i][0].value;
                     var accidental = parseInt(currentSelects[i][1].value);
@@ -162,43 +188,41 @@
                     var maj = 1 ? scale==='Maj' : 0;
                     var min = 1 ? scale==='Min' : 0;
                     var type = parseInt(currentSelects[i][3].value);
-
                     var filteredChords = Object.fromEntries(Object.entries(chordsMeta).filter(([k,v])=> v['Root']==tonic));
                     filteredChords = Object.fromEntries(Object.entries(filteredChords).filter(([k,v])=> v['Major']==maj));
                     filteredChords = Object.fromEntries(Object.entries(filteredChords).filter(([k,v])=> v['Minor']==min));
                     filteredChords = Object.fromEntries(Object.entries(filteredChords).filter(([k,v])=> v['FlatSharpStep']==accidental));
                     filteredChords = Object.fromEntries(Object.entries(filteredChords).filter(([k,v])=> v['AugAddDimSus']==type));
-                    //console.log(Object.keys(filteredChords));
-
                     var obj = currentSelects[i][4];
-                    updateChordSelectChildren(obj, Object.keys(filteredChords))
+                    updateChordSelectChildren(obj, Object.keys(filteredChords));
                 }
             }
-        }
+        };
 
 
         function currentChords() {
             var currentSelectedChords = []
             for (var i=0; i<currentSelects.length; i++) {
-                var chord = currentSelects[i][4].value
-                currentSelectedChords.push(chord)
+                var chord = currentSelects[i][4].value;
+                currentSelectedChords.push(chord);
             }
-            return currentSelectedChords
-        }
+            return currentSelectedChords;
+        };
 
 
         function currentPatterns() {
-            var currentSelectedChords = currentChords()
-            var currentPatternSet = chordsData[currentSelectedChords[0]]
-            for (var i=0; i<currentSelectedChords.length; i++) {
-                var intersection = currentPatternSet.filter(element=>chordsData[currentSelectedChords[i]].includes(element))
-                currentPatternSet = intersection
+            if (currentSelects.length > 0) {
+                var currentSelectedChords = currentChords();
+                var currentPatternSet = chordsData[currentSelectedChords[0]];
+                for (var i=0; i<currentSelectedChords.length; i++) {
+                    var intersection = currentPatternSet.filter(element=>chordsData[currentSelectedChords[i]].includes(element));
+                    currentPatternSet = intersection;
+                };
+                matchingPatterns = currentPatternSet;
+                
+                createPatternTables();
             }
-            matchingPatterns = currentPatternSet
-            console.log(currentPatternSet)
-
-            createPatternTables()
-        }
+        };
 
 
         function extractData(patternData) {
@@ -208,80 +232,134 @@
                 patternChords.push(patternData[buttons[j]]['Chord']);
                 patternNotes.push(patternData[buttons[j]]['Notes']);
             }
-            return patternChords, patternNotes
-        }
+            return patternChords, patternNotes;
+        };
 
 
         function generateTable(patternID, buttons, patternChords, patternNotes) {
-            var patternBox = document.getElementById("patternList")
-            var table = document.createElement('table')
-            var tbody = document.createElement('thead')
-            var tr = document.createElement('tr')
-            var th = document.createElement('th')
-            th.appendChild(document.createTextNode('Pattern '+parseInt(patternID)))
-            tr.appendChild(th)
-
+            var patternBox = document.getElementById("patternList");
+            var table = document.createElement('table');
+            var tbody = document.createElement('thead');
+            var tr = document.createElement('tr');
+            var th = document.createElement('th');
+            th.appendChild(document.createTextNode('Pattern '+parseInt(patternID)));
+            tr.appendChild(th);
             for (var i=0; i<buttons.length; i++) {
-                var th = document.createElement('th')
-                th.appendChild(document.createTextNode(buttons[i]))
-                tr.appendChild(th)
-            }
-            tbody.appendChild(tr)
-
-            var tr = document.createElement('tr')
-            var td = document.createElement('td')
-            td.appendChild(document.createTextNode('Chords'))
-            tr.appendChild(td)
-
+                var th = document.createElement('th');
+                th.onclick = function() {
+                    drawPattern(patternID)
+                }
+                th.appendChild(document.createTextNode(buttons[i]));
+                tr.appendChild(th);
+            };
+            tbody.appendChild(tr);
+            var tr = document.createElement('tr');
+            var td = document.createElement('td');
+            td.appendChild(document.createTextNode('Chords'));
+            tr.appendChild(td);
             for (var i=0; i<patternChords.length; i++) {
-                var td = document.createElement('td')
-                td.appendChild(document.createTextNode(patternChords[i]))
-                tr.appendChild(td)
-            }
-            tbody.appendChild(tr)
-
-            table.appendChild(tbody)
-
-
-            patternBox.appendChild(table)
+                var td = document.createElement('td');
+                td.onclick = function() {
+                    drawPattern(patternID)
+                }
+                td.appendChild(document.createTextNode(patternChords[i]));
+                tr.appendChild(td);
+            };
+            tbody.appendChild(tr);
+            table.appendChild(tbody);
+            patternBox.appendChild(table);
             lineBreak = document.createElement("br");
             patternBox.appendChild(lineBreak);
             patternBox.appendChild(lineBreak);
+            
+        };
+
+        function change() {
+            const elementsTD = document.getElementsByTagName("td");
+            for (const element of elementsTD) {
+                element.classList.toggle("transformed-state");
+            }
+            const elementsTH = document.getElementsByTagName("th");
+            for (const element of elementsTH) {
+                element.classList.toggle("transformed-state");
+            }
+        };
+
+        function changeKeyShow(key) {
+            const elementsRect = document.getElementById(key);
+            elementsRect.classList.toggle("transformed-state-rect"); 
+            if (displayedKeys.includes(key) === false) {
+                displayedKeys.push(key)  ;
+            }
+            if (key == 'C') {
+                const elementsRect = document.getElementById('C2');
+                elementsRect.classList.toggle("transformed-state-rect");
+            }
+        
+        };
 
 
-        }
+        function hideKeys() {
+            for (var i=0; i<displayedKeys.length; i++) {
+                changeKeyShow(displayedKeys[i]);
+            }
+            displayedKeys = [];
+            var patternBox = document.getElementById("PatternNo");
+            patternBox.innerHTML = 0;
+        };
+
 
 
         function createPatternTables() {
-            var patternBox = document.getElementById("patternList")
-            patternBox.innerHTML = "";
-
+            var patternBox = document.getElementById("patternList");
+            patternBox.innerHTML = "<p>Click a pattern to see your selected chords displayed:</p><br>";
             for (var i=0; i<matchingPatterns.length; i++) {
                 patternID = matchingPatterns[i];
                 patternData = settings[patternID];
                 buttons = Object.keys(patternData);
-                patternChords, patternNotes = extractData(patternData)
-
-                generateTable(patternID, buttons, patternChords, patternNotes)
-
-                console.log(patternID);
-                console.log(buttons);
-                console.log(patternChords);
-                console.log(patternNotes);
+                patternChords, patternNotes = extractData(patternData);
+                generateTable(patternID, buttons, patternChords, patternNotes);
             }
-
-        }
+            setTimeout(function(){
+                change();
+            }, 100);
+        };
 
 
         function removeChordClick() {
-            console.log('remove clicked')
-
-            toDelete = currentSelects.at(-1)
-
-            for (var i = 0; i < toDelete.length; i++) {
-                chordDiv.removeChild(toDelete[i])
+            var curSelectLen = currentSelects.length;
+            if (curSelectLen > 0) {
+                toDelete = currentSelects.at(-1);
+                for (var i = 0; i < toDelete.length; i++) {
+                    chordDiv.removeChild(toDelete[i]);
+                };
+                currentSelects = currentSelects.slice(0,-1);
             }
-            currentSelects = currentSelects.slice(0,-1)
+        };
+
+        function getChordButtons(data, chords, buttons) {
+            var selectedButtons = [];
+            var selectedChords = [];
+            for (var i=0; i<buttons.length; i++) {
+                if (chords.includes(data[buttons[i]]['Chord'])) {
+                    selectedButtons.push(buttons[i]);
+                    selectedChords.push(data[buttons[i]]['Chord']);
+                }
+            };
+            return {selectedButtons, selectedChords}
+        };
+
+        function drawPattern(num) {
+            var data = settings[num]; // all patterns
+            var chords = currentChords(); // selected chords
+            var buttons = Object.keys(data);
+            let {selectedButtons, selectedChords} = getChordButtons(data, chords, buttons);
+            hideKeys()
+            for (var i=0; i<selectedButtons.length; i++) {
+                changeKeyShow(selectedButtons[i]);
+            }
+            var patternBox = document.getElementById("PatternNo");
+            patternBox.innerHTML = num;
         }
 
     </script>
