@@ -28,7 +28,8 @@
         <div class="img-block">
             <div class="img-overlay-wrap">
 
-                <img id="device" src="/image.png" style="width:600px;height:350px;">
+                <!--<img id="device" src="/image.png" style="width:600px;height:350px;">-->
+                <img id="device" src="image.png" style="width:600px;height:350px;">
                 <svg id="graphics" viewBox="0 0 600 350">
                     <!--<circle cx="75" cy="75" r="50" fill="rebeccapurple"/>-->
                     <rect x="104" y="251" width="34" height="57" id="C"/>
@@ -73,6 +74,9 @@
         <div>
             <p>
                 <br>
+                <div id="NoteTable">
+
+                </div>
                 <div class ="patterns" id="patternList">
                     <p>
                         No chords selected. <br><br>
@@ -146,6 +150,8 @@
 
 
         function addChordClick() {
+            var noteBox = document.getElementById("NoteTable");
+            noteBox.innerHTML = "";
             var curSelectLen = currentSelects.length;
             if (curSelectLen < 8) {
                 tonicSelector      = addSelector(tonicArray,tonicArray, 'tonic');
@@ -274,6 +280,62 @@
             
         };
 
+        function generateTableNotes(patternID, buttons, patternChords, patternNotes) {
+            var patternBox = document.getElementById("NoteTable");
+            var table = document.createElement('table');
+            var tbody = document.createElement('thead');
+            var tr = document.createElement('tr');
+            var th = document.createElement('th');
+            th.appendChild(document.createTextNode('Pattern '+parseInt(patternID)));
+            tr.appendChild(th);
+            for (var i=0; i<buttons.length; i++) {
+                var th = document.createElement('th');
+                th.onclick = function() {
+                    drawPattern(patternID)
+                }
+                th.appendChild(document.createTextNode(buttons[i]));
+                tr.appendChild(th);
+            };
+            tbody.appendChild(tr);
+            var tr = document.createElement('tr');
+            var td = document.createElement('td');
+            td.appendChild(document.createTextNode('Chords'));
+            tr.appendChild(td);
+            for (var i=0; i<patternChords.length; i++) {
+                var td = document.createElement('td');
+                td.onclick = function() {
+                    drawPattern(patternID)
+                }
+                td.appendChild(document.createTextNode(patternChords[i]));
+                tr.appendChild(td);
+            };
+
+            for (var j=0; j<patternNotes[0].length; j++) {
+                tbody.appendChild(tr);
+                var tr = document.createElement('tr');
+                var td = document.createElement('td');
+                td.appendChild(document.createTextNode('Notes'));
+                tr.appendChild(td);
+                for (var i=0; i<patternNotes.length; i++) {
+                    var td = document.createElement('td');
+                    td.onclick = function() {
+                        drawPattern(patternID)
+                    }
+                    td.appendChild(document.createTextNode(patternNotes[i][j]));
+                    tr.appendChild(td);
+                };
+            }
+
+
+            tbody.appendChild(tr);
+            table.appendChild(tbody);
+            patternBox.appendChild(table);
+            lineBreak = document.createElement("br");
+            patternBox.appendChild(lineBreak);
+            patternBox.appendChild(lineBreak);
+            
+        };
+
         function change() {
             const elementsTD = document.getElementsByTagName("td");
             for (const element of elementsTD) {
@@ -313,6 +375,9 @@
         function createPatternTables() {
             var patternBox = document.getElementById("patternList");
             patternBox.innerHTML = "<p>Click a pattern to see your selected chords displayed:</p><br>";
+
+            var noteBox = document.getElementById("NoteTable");
+            noteBox.innerHTML = "";
             for (var i=0; i<matchingPatterns.length; i++) {
                 patternID = matchingPatterns[i];
                 patternData = settings[patternID];
@@ -327,6 +392,8 @@
 
 
         function removeChordClick() {
+            var noteBox = document.getElementById("NoteTable");
+            noteBox.innerHTML = "";
             var curSelectLen = currentSelects.length;
             if (curSelectLen > 0) {
                 toDelete = currentSelects.at(-1);
@@ -360,6 +427,11 @@
             }
             var patternBox = document.getElementById("PatternNo");
             patternBox.innerHTML = num;
+
+            var noteBox = document.getElementById("NoteTable");
+            noteBox.innerHTML = "";
+            patternChords, patternNotes = extractData(data);
+            generateTableNotes(patternID, buttons, patternChords, patternNotes)
         }
 
     </script>
